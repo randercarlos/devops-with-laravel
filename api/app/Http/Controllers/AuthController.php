@@ -1,8 +1,8 @@
 <?php
 
-namespace api\app\Http\Controllers;
+namespace App\Http\Controllers;
 
-use api\app\Models\User;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;

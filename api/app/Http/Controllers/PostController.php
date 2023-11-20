@@ -1,13 +1,13 @@
 <?php
 
-namespace api\app\Http\Controllers;
+namespace App\Http\Controllers;
 
-use api\app\Exports\PostsExport;
-use api\app\Http\Controllers\Controller;
-use api\app\Http\Requests\UpsertPostRequest;
-use api\app\Http\Resources\PostResource;
-use api\app\Jobs\NotifyUserAboutCompletedExport;
-use api\app\Models\Post;
+use App\Exports\PostsExport;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\UpsertPostRequest;
+use App\Http\Resources\PostResource;
+use App\Jobs\NotifyUserAboutCompletedExport;
+use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;

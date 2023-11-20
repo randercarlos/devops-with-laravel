@@ -1,10 +1,10 @@
 <?php
 
-namespace api\app\Listeners;
+namespace App\Listeners;
 
-use api\app\Events\PostPublishedEvent;
-use api\app\Models\User;
-use api\app\Notifications\PostPublishedNotification;
+use App\Events\PostPublishedEvent;
+use App\Models\User;
+use App\Notifications\PostPublishedNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 

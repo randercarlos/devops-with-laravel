@@ -1,12 +1,12 @@
 <?php
 
-namespace api\tests\Feature;
+namespace Tests\Feature;
 
-use api\app\Models\Post;
-use api\app\Models\User;
+use App\Models\Post;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Symfony\Component\HttpFoundation\Response;
-use api\tests\TestCase;
+use Tests\TestCase;
 
 class UpsertPostTest extends TestCase
 {

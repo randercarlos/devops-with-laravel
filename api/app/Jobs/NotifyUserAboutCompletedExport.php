@@ -1,9 +1,9 @@
 <?php
 
-namespace api\app\Jobs;
+namespace App\Jobs;
 
-use api\app\Models\User;
-use api\app\Notifications\ExportCompletedNotification;
+use App\Models\User;
+use App\Notifications\ExportCompletedNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

@@ -1,9 +1,9 @@
 <?php
 
-namespace api\app\Providers;
+namespace App\Providers;
 
-use api\app\Events\PostPublishedEvent;
-use api\app\Listeners\SendPostPublishedNotifications;
+use App\Events\PostPublishedEvent;
+use App\Listeners\SendPostPublishedNotifications;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;

@@ -1,9 +1,9 @@
 <?php
 
-namespace api\app\Models;
+namespace App\Models;
 
-use api\app\Events\PostPublishedEvent;
-use api\app\Models\User;
+use App\Events\PostPublishedEvent;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

@@ -1,8 +1,8 @@
 <?php
 
-namespace api\app\Console;
+namespace App\Console;
 
-use api\app\Jobs\PublishPostsJob;
+use App\Jobs\PublishPostsJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 

@@ -1,9 +1,9 @@
 <?php
 
-namespace api\app\Http\Resources;
+namespace App\Http\Resources;
 
-use api\app\Http\Resources\UserResource;
-use api\app\Models\Post;
+use App\Http\Resources\UserResource;
+use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 

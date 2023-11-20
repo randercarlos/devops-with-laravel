@@ -1,8 +1,8 @@
 <?php
 
-namespace api\app\Exports;
+namespace App\Exports;
 
-use api\app\Models\Post;
+use App\Models\Post;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\Exportable;

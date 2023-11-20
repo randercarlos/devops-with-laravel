@@ -1,8 +1,8 @@
 <?php
 
-namespace api\app\Jobs;
+namespace App\Jobs;
 
-use api\app\Models\Post;
+use App\Models\Post;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
