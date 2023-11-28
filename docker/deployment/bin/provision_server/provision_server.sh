@@ -4,16 +4,25 @@ set -e
 
 SSH_KEY=$1
 
-useradd -G www-data,root,sudo,docker -u 1000 -d /home/martin martin
-mkdir -p /home/martin/.ssh
-touch /home/martin/.ssh/authorized_keys
-chown -R martin:martin /home/martin
-chown -R martin:martin /usr/src
-chmod 700 /home/martin/.ssh
-chmod 644 /home/martin/.ssh/authorized_keys
-echo "$SSH_KEY" >> /home/martin/.ssh/authorized_keys
+export PATH="/usr/sbin:$PATH"
+if ! id "apprunner" >/dev/null 2>&1; then
+    sudo useradd -G www-data,root,sudo -u 2000 -d /home/apprunner apprunner
+    sudo mkdir -p /home/apprunner/.ssh
+    sudo touch /home/apprunner/.ssh/authorized_keys
+    sudo chown -R apprunner:apprunner /home/apprunner
+    sudo chown -R apprunner:apprunner /usr/src
+    sudo chmod 700 /home/apprunner/.ssh
+    sudo chmod 644 /home/apprunner/.ssh/authorized_keys
+    echo "$SSH_KEY" | sudo tee -a /home/apprunner/.ssh/authorized_keys >/dev/null
 
-echo "martin ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/martin
+    echo "apprunner ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/apprunner
+fi
+
+# Install docker
+sudo apt-get update -y
+sudo curl -fsSL https://get.docker.com/ | sh
+sudo usermod -aG docker apprunner
+docker --version
 
 # Install docker-compose
 sudo curl -L "https://github.com/docker/compose/releases/download/v2.19.1/docker-compose-linux-x86_64" -o /usr/local/bin/docker-compose

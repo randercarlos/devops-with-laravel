@@ -25,9 +25,9 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build images
         run: |
-          docker build -t $API_IMAGE --target=api --build-arg user=martin --build-arg uid=1000 -f ./api/Dockerfile .
-          docker build -t $SCHEDULER_IMAGE --target=scheduler --build-arg user=martin --build-arg uid=1000 -f ./api/Dockerfile .
-          docker build -t $WORKER_IMAGE --target=worker --build-arg user=martin --build-arg uid=1000 -f ./api/Dockerfile .
+          docker build -t $API_IMAGE --target=api -f ./api/Dockerfile .
+          docker build -t $SCHEDULER_IMAGE --target=scheduler -f ./api/Dockerfile .
+          docker build -t $WORKER_IMAGE --target=worker -f ./api/Dockerfile .
       - name: Push images
         run: |
           docker push $API_IMAGE
@@ -149,10 +149,10 @@ jobs:
           chmod 600 id_rsa
       - name: Deploy app
         run: |
-          scp -C -o StrictHostKeyChecking=no -i ./id_rsa ./deployment/bin/deploy.sh ${{ secrets.SSH_CONNECTION_PROD }}:/home/martin/deploy.sh
+          scp -C -o StrictHostKeyChecking=no -i ./id_rsa ./deployment/bin/deploy.sh ${{ secrets.SSH_CONNECTION_PROD }}:/home/apprunner/deploy.sh
           scp -C -o StrictHostKeyChecking=no -i ./id_rsa ./docker-compose.prod.yml ${{ secrets.SSH_CONNECTION_PROD }}:/usr/src/docker-compose.prod.yml
           scp -C -o StrictHostKeyChecking=no -i ./id_rsa ./.env.prod.template ${{ secrets.SSH_CONNECTION_PROD }}:/usr/src/.env
-          ssh -tt -o StrictHostKeyChecking=no -i ./id_rsa ${{ secrets.SSH_CONNECTION_PROD }} "chmod +x /home/martin/deploy.sh"
+          ssh -tt -o StrictHostKeyChecking=no -i ./id_rsa ${{ secrets.SSH_CONNECTION_PROD }} "chmod +x /home/apprunner/deploy.sh"
           ssh -tt -o StrictHostKeyChecking=no -i ./id_rsa ${{ secrets.SSH_CONNECTION_PROD }} "
             sed -i "/IMAGE_TAG/c\IMAGE_TAG=${{ github.sha }}" /usr/src/.env
             sed -i "/COMPOSE_PROJECT_NAME/c\COMPOSE_PROJECT_NAME=devops-with-laravel" /usr/src/.env
@@ -164,4 +164,4 @@ jobs:
             sed -i "/AWS_ACCESS_KEY_ID/c\AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" /usr/src/.env
             sed -i "/AWS_SECRET_ACCESS_KEY/c\AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" /usr/src/.env
             sed -i "/APP_KEY/c\APP_KEY=${{ secrets.APP_KEY }}" /usr/src/.env"
-          ssh -tt -o StrictHostKeyChecking=no -i ./id_rsa ${{ secrets.SSH_CONNECTION_PROD }} "/home/martin/deploy.sh"
+          ssh -tt -o StrictHostKeyChecking=no -i ./id_rsa ${{ secrets.SSH_CONNECTION_PROD }} "/home/apprunner/deploy.sh"
