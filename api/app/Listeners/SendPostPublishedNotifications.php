@@ -18,7 +18,7 @@ class SendPostPublishedNotifications implements ShouldQueue
     {
         User::where('id', '!=', $event->post->author->id)
             ->get()
-            ->take(3)
+//            ->take(3)
             ->each
             ->notify(
                 (new PostPublishedNotification($event->post))->onQueue('notifications')
