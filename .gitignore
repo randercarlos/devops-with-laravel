@@ -2,3 +2,9 @@
 .idea
 ssh-lightsail.txt
 lightsail-private-key.pem
+
+.DS_Store
+.idea
+redisdata
+mysqldata
+.env
