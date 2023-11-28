@@ -1,0 +1,100 @@
+version: "3.8"
+services:
+  proxy:
+    image: martinjoo/posts-proxy:${IMAGE_TAG}
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - nginx
+
+  frontend:
+    image: martinjoo/posts-frontend:${IMAGE_TAG}
+    restart: unless-stopped
+
+  api:
+    image: martinjoo/posts-api:${IMAGE_TAG}
+    command: sh -c "./wait-for-it.sh mysql:3306 -t 30 && ./wait-for-it.sh redis:6379 -t 30 && php-fpm"
+    restart: unless-stopped
+    volumes:
+      - ./.env:/usr/src/.env
+      - type: volume
+        source: storage
+        target: /usr/src/storage
+    depends_on:
+      - update
+      - mysql
+      - redis
+
+  scheduler:
+    image: martinjoo/posts-scheduler:${IMAGE_TAG}
+    restart: unless-stopped
+    volumes:
+      - ./.env:/usr/src/.env
+      - type: volume
+        source: storage
+        target: /usr/src/storage
+    depends_on:
+      - update
+      - mysql
+      - redis
+
+  worker:
+    image: martinjoo/posts-worker:${IMAGE_TAG}
+    restart: unless-stopped
+    volumes:
+      - ./.env:/usr/src/.env
+      - type: volume
+        source: storage
+        target: /usr/src/storage
+    depends_on:
+      - update
+      - mysql
+      - redis
+
+  nginx:
+    image: martinjoo/posts-nginx:${IMAGE_TAG}
+    restart: unless-stopped
+    depends_on:
+      - api
+
+  mysql:
+    image: martinjoo/posts-mysql:${IMAGE_TAG}
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: mysqldata
+        target: /var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+
+  redis:
+    image: redis:7.0.11-alpine
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: redisdata
+        target: /data
+
+  update:
+    image: martinjoo/posts-api:${IMAGE_TAG}
+    command: sh -c "./wait-for-it.sh mysql:3306 -t 30 && ./update.sh"
+    restart: no
+    volumes:
+      - ./.env:/usr/src/.env
+    depends_on:
+      - mysql
+
+  watchtower:
+    image: containrrr/watchtower:1.5.3
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - REPO_USER=${DOCKERHUB_USERNAME}
+      - REPO_PASS=${DOCKERHUB_PASSWORD}
+
+volumes:
+  storage:
+  mysqldata:
+  redisdata:
