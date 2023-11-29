@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   proxy:
-    image: martinjoo/posts-proxy:${IMAGE_TAG}
+    image: rcarlos/devops-with-laravel-proxy:${IMAGE_TAG}
     restart: unless-stopped
     ports:
       - "80:80"
@@ -10,11 +10,11 @@ services:
       - nginx
 
   frontend:
-    image: martinjoo/posts-frontend:${IMAGE_TAG}
+    image: rcarlos/devops-with-laravel-frontend:${IMAGE_TAG}
     restart: unless-stopped
 
   api:
-    image: martinjoo/posts-api:${IMAGE_TAG}
+    image: rcarlos/devops-with-laravel-api:${IMAGE_TAG}
     command: sh -c "./wait-for-it.sh mysql:3306 -t 30 && ./wait-for-it.sh redis:6379 -t 30 && php-fpm"
     restart: unless-stopped
     volumes:
@@ -28,7 +28,7 @@ services:
       - redis
 
   scheduler:
-    image: martinjoo/posts-scheduler:${IMAGE_TAG}
+    image: rcarlos/devops-with-laravel-scheduler:${IMAGE_TAG}
     restart: unless-stopped
     volumes:
       - ./.env:/usr/src/.env
@@ -41,7 +41,7 @@ services:
       - redis
 
   worker:
-    image: martinjoo/posts-worker:${IMAGE_TAG}
+    image: rcarlos/devops-with-laravel-worker:${IMAGE_TAG}
     restart: unless-stopped
     volumes:
       - ./.env:/usr/src/.env
@@ -54,13 +54,13 @@ services:
       - redis
 
   nginx:
-    image: martinjoo/posts-nginx:${IMAGE_TAG}
+    image: rcarlos/devops-with-laravel-nginx:${IMAGE_TAG}
     restart: unless-stopped
     depends_on:
       - api
 
   mysql:
-    image: martinjoo/posts-mysql:${IMAGE_TAG}
+    image: rcarlos/devops-with-laravel-database:${IMAGE_TAG}
     restart: unless-stopped
     volumes:
       - type: volume
@@ -78,7 +78,7 @@ services:
         target: /data
 
   update:
-    image: martinjoo/posts-api:${IMAGE_TAG}
+    image: rcarlos/devops-with-laravel-api:${IMAGE_TAG}
     command: sh -c "./wait-for-it.sh mysql:3306 -t 30 && ./update.sh"
     restart: no
     volumes:

@@ -8,3 +8,4 @@ lightsail-private-key.pem
 redisdata
 mysqldata
 .env
+id_rsa
