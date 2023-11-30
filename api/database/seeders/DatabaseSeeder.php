@@ -10,6 +10,9 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-         Post::factory(100)->create();
+        $existsPosts = Post::exists();
+        if (! $existsPosts) {
+            Post::factory(100)->create();
+        }
     }
 }
