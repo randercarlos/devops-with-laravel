@@ -17,7 +17,7 @@ if ! id "apprunner" >/dev/null 2>&1; then
     sudo chmod 644 /home/apprunner/.ssh/authorized_keys
     echo "$SSH_KEY" | sudo tee -a /home/apprunner/.ssh/authorized_keys >/dev/null
 
-    echo "apprunner ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/apprunner
+    sudo bash -c 'echo "apprunner ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/apprunner'
 fi
 
 # Install docker
