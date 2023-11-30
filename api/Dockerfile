@@ -1,5 +1,7 @@
 FROM php:8.1-fpm as api
 
+ARG ENV=dev
+
 WORKDIR /usr/src
 
 RUN apt-get update && apt-get install -y \
@@ -28,12 +30,18 @@ COPY ./deployment/config/php-fpm/php-prod.ini /usr/local/etc/php/conf.d/php.ini
 COPY ./deployment/config/php-fpm/www.conf /usr/local/etc/php-fpm.d/www.conf
 COPY ./deployment/bin/update.sh /usr/src/update.sh
 
-RUN composer install --no-scripts
+RUN /bin/bash -c ' \
+    if [ "$ENV" = "dev" ]; then \
+        composer install --no-scripts; \
+    else \
+        composer install --optimize-autoloader --no-dev; \
+    fi' \
 
 COPY ./api .
 
 RUN php artisan storage:link --force && \
     chmod +x ./update.sh && \
+    chmod +x ./wait-for-it.sh && \
     chown -R www-data:www-data /usr/src && \
     chmod -R 775 ./storage ./bootstrap/cache
 
