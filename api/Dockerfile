@@ -26,7 +26,6 @@ RUN pecl install redis
 COPY --from=composer:2.5.8 /usr/bin/composer /usr/bin/composer
 
 COPY ./api/composer.* /usr/src/
-COPY ./api/artisan /usr/src/artisan
 COPY ./deployment/config/php-fpm/php-prod.ini /usr/local/etc/php/conf.d/php.ini
 COPY ./deployment/config/php-fpm/www.conf /usr/local/etc/php-fpm.d/www.conf
 COPY ./deployment/bin/update.sh /usr/src/update.sh
@@ -35,7 +34,7 @@ RUN /bin/bash -c ' \
     if [ "$ENV" = "dev" ]; then \
         composer install --no-scripts; \
     else \
-        composer install --optimize-autoloader --no-dev; \
+        composer install --optimize-autoloader --no-dev --no-scripts; \
     fi' \
 
 COPY ./api .
