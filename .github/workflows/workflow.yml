@@ -22,10 +22,10 @@ jobs:
       - uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Build images
         run: |
-          docker build -t $API_IMAGE --target=api -f ./api/Dockerfile .
+          docker build -t $API_IMAGE --build-arg ENV=prod --target=api -f ./api/Dockerfile .
           docker build -t $SCHEDULER_IMAGE --target=scheduler -f ./api/Dockerfile .
           docker build -t $WORKER_IMAGE --target=worker -f ./api/Dockerfile .
       - name: Push images
@@ -41,7 +41,7 @@ jobs:
       - uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Build MySQL image
         run: docker build -t $MYSQL_IMAGE --build-arg password=${{ secrets.DB_PASSWORD }} -f ./Dockerfile.mysql .
       - name: Push Mysql image
@@ -55,7 +55,7 @@ jobs:
       - uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Pull API image
         run: docker pull $API_IMAGE
       - name: Pull MySQL image
@@ -73,7 +73,7 @@ jobs:
       - uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Pull API image
         run: docker pull $API_IMAGE
       - name: Pull MySQL image
@@ -104,7 +104,7 @@ jobs:
       - uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Build nginx image
         run: |
           docker build -t $NGINX_IMAGE -f ./Dockerfile.nginx .
@@ -118,7 +118,7 @@ jobs:
       - uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Build nginx image
         run: |
           docker build -t $PROXY_IMAGE -f ./Dockerfile.proxy .
@@ -132,7 +132,7 @@ jobs:
       - uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Build frontend image
         run: |
           docker build -t $FRONTEND_IMAGE --target=prod -f ./frontend/Dockerfile .
