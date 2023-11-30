@@ -25,7 +25,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Build images
         run: |
-          docker build -t $API_IMAGE --build-arg ENV=prod --target=api -f ./api/Dockerfile .
+          docker build -t $API_IMAGE --target=api -f ./api/Dockerfile .
           docker build -t $SCHEDULER_IMAGE --target=scheduler -f ./api/Dockerfile .
           docker build -t $WORKER_IMAGE --target=worker -f ./api/Dockerfile .
       - name: Push images
