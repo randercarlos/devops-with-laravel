@@ -19,4 +19,4 @@ token=$(jq -r '.token' response.json)
 curl -i -X DELETE \
   -H "Accept: application/json" \
   -H "Authorization: JWT $token" \
-  https://hub.docker.com/v2/repositories/martinjoo/$IMAGE/tags/$TAG
+  https://hub.docker.com/v2/repositories/$DOCKERHUB_USERNAME/$IMAGE/tags/$TAG
