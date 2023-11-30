@@ -4,7 +4,7 @@ services:
     image: rcarlos/devops-with-laravel-proxy:${IMAGE_TAG}
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "8100:80"
     depends_on:
       - frontend
       - nginx
