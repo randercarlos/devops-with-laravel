@@ -47,7 +47,7 @@ RUN php artisan storage:link --force && \
     chown -R www-data:www-data /usr/src && \
     chmod -R 775 ./storage ./bootstrap/cache
 
-# Create the directory and set permissions
+# allow run "php artisan tinker" inside the container without error
 RUN mkdir -p /var/www/.config/psysh && \
         chown -R www-data:www-data /var/www/.config/psysh
 
