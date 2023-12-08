@@ -1,6 +1,9 @@
 <template>
 <div>
-    <router-link :to="{ name: 'posts-form' }">New post</router-link>
+    <div class="actions">
+      <router-link :to="{ name: 'posts-form' }">New post</router-link>
+      <button @click="exportPosts()">Export All Posts</button>
+    </div>
     <table>
         <tr>
             <th>Title</th>
@@ -51,7 +54,28 @@ export default {
           });
 
           await this.fetch();
+        },
+
+        async exportPosts() {
+          try {
+            await axios.get(`/api/posts/export`, {
+              headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` },
+            });
+
+            alert('Posts will be export in async way. On finish, a email will be sent.')
+          } catch(e) {
+            alert('Falha ao exportar posts')
+          }
         }
     }
 }
 </script>
+
+<style scoped>
+  .actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    height: 50px;
+  }
+</style>
