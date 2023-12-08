@@ -25,27 +25,25 @@ RUN pecl install redis
 
 COPY --from=composer:2.5.8 /usr/bin/composer /usr/bin/composer
 
-COPY ./api/composer.* /usr/src/
 COPY ./api .
 COPY ./deployment/config/php-fpm/php-prod.ini /usr/local/etc/php/conf.d/php.ini
 COPY ./deployment/config/php-fpm/www.conf /usr/local/etc/php-fpm.d/www.conf
 COPY ./deployment/bin/update.sh /usr/src/update.sh
 COPY ./deployment/bin/wait-for-it.sh /usr/src/wait-for-it.sh
 
-RUN /bin/bash -c ' \
-    if [ "$ENV" = "dev" ]; then \
+# Install dependencies based on the environment
+RUN if [ "$ENV" = "dev" ]; then \
         composer install; \
     else \
         composer install --optimize-autoloader --no-dev; \
-    fi' \
-
-COPY ./api .
+    fi
 
 RUN php artisan storage:link --force && \
     chmod +x ./update.sh && \
     chmod +x ./wait-for-it.sh && \
     chown -R www-data:www-data /usr/src && \
     chmod -R 775 ./storage ./bootstrap/cache
+
 
 # allow run "php artisan tinker" inside the container without error
 RUN mkdir -p /var/www/.config/psysh && \
