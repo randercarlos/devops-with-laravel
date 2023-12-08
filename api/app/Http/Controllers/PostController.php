@@ -60,19 +60,24 @@ class PostController extends Controller
         return response()->noContent();
     }
 
-    public function export(Request $request)
+    public function export()
     {
-        $date = now()->format('Ymd_His');
+        $exportedPostsPath = "exports/posts-" . now()->format('Ymd_His') . ".xlsx";
 
-        $path = "public/exports/posts-$date.xlsx";
+        $link = Storage::disk('public')->url($exportedPostsPath);
 
-        $link = url()->to('/') . Storage::url($path);
+        $excelPostsExport = new PostsExport();
+        $excelPostsExport->store($exportedPostsPath, 'public');
+        NotifyUserAboutCompletedExport::dispatch(auth()->user(), $link);
 
-        (new PostsExport())->store($path)->chain([
-            new NotifyUserAboutCompletedExport($request->user(), $link),
-        ]);
+//        (new PostsExport())->store($exportedPostsPath, 'public')->chain([
+//            new NotifyUserAboutCompletedExport($request->user(), $link),
+//        ]);
 
-        return response('', Response::HTTP_ACCEPTED);
+        logger()->info('Exportação será iniciada...');
+        logger()->info("Arquivo: $exportedPostsPath");
+
+        return response('Exportação será iniciada', Response::HTTP_ACCEPTED);
     }
 
     public function publish(Post $post)

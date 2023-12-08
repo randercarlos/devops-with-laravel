@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,6 +23,10 @@ class AppServiceProvider extends ServiceProvider
                     $query->sql . ' [' . implode(', ', $query->bindings) . ']' . PHP_EOL
                 );
             });
+        }
+
+        if ($this->app->environment('local')) {
+            Mail::alwaysTo(config('email.from.address'));
         }
     }
 }
