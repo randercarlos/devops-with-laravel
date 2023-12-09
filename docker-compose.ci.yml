@@ -1,7 +1,11 @@
 version: "2.4"
 services:
   api:
-    image: ${API_IMAGE}
+#    image: ${API_IMAGE}
+    build:
+      context: .
+      dockerfile: ./api/Dockerfile
+      target: api
     environment:
       - APP_NAME=posts
       - APP_ENV=local
@@ -25,7 +29,10 @@ services:
         condition: service_healthy
 
   mysql-test:
-    image: ${MYSQL_IMAGE}
+#    image: ${MYSQL_IMAGE}
+    build:
+      context: .
+      dockerfile: ./Dockerfile.mysql
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping" ]
       interval: 10s
@@ -35,7 +42,10 @@ services:
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
 
   migrate:
-    image: ${API_IMAGE}
+#    image: ${API_IMAGE}
+    build:
+      context: .
+      dockerfile:  ./api/Dockerfile
     environment:
       - APP_ENV=local
       - APP_KEY=base64:aL6o/U2e1ziUTXsyTkfzNziH9l4crCISoWMwC8LX4B0=
