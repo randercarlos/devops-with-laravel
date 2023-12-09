@@ -32,6 +32,8 @@ class PublishPostTest extends TestCase
 
         $this->getJson(route('posts.show', ['post' => $post]))
             ->assertStatus(Response::HTTP_OK);
+
+        $this->assertEquals(false, true);
     }
 
     /** @test */
