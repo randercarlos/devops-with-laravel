@@ -36,8 +36,7 @@ jobs:
         run: docker build -t $MYSQL_IMAGE --build-arg password=${{ secrets.DB_PASSWORD }} -f ./Dockerfile.mysql .
       - name: Run tests
         run: |
-          docker-compose -f docker-compose.ci.yml up -d
-          docker-compose -f docker-compose.ci.yml exec -T api php artisan test
+          docker run --rm -t $API_IMAGE php artisan test
 
   build-backend-images:
     needs: [ analyze-code, test-code ]
@@ -59,7 +58,7 @@ jobs:
           docker push $SCHEDULER_IMAGE
           docker push $WORKER_IMAGE
 
-  build-database:
+  build-database-image:
     needs: [ analyze-code, test-code ]
     runs-on: ubuntu-latest
     steps:
@@ -73,7 +72,7 @@ jobs:
       - name: Push Mysql image
         run: docker push $MYSQL_IMAGE
 
-  build-nginx:
+  build-nginx-image:
     needs: [ analyze-code, test-code ]
     runs-on: ubuntu-latest
     steps:
@@ -87,7 +86,7 @@ jobs:
           docker build -t $NGINX_IMAGE -f ./Dockerfile.nginx .
           docker push $NGINX_IMAGE
 
-  build-proxy:
+  build-proxy-image:
     needs: [ analyze-code, test-code ]
     runs-on: ubuntu-latest
     steps:
@@ -101,7 +100,7 @@ jobs:
           docker build -t $PROXY_IMAGE -f ./Dockerfile.proxy .
           docker push $PROXY_IMAGE
 
-  build-frontend:
+  build-frontend-image:
     needs: [ analyze-code, test-code ]
     runs-on: ubuntu-latest
     steps:
@@ -116,7 +115,7 @@ jobs:
           docker push $FRONTEND_IMAGE
 
   deploy-code-prod:
-    needs: [ analyze-code, test-code, build-backend-images, build-database, build-frontend, build-nginx, build-proxy ]
+    needs: [ analyze-code, test-code, build-backend-images, build-database-image, build-frontend-image, build-nginx-image, build-proxy-image ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
