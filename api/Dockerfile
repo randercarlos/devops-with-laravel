@@ -5,6 +5,7 @@ ARG ENV=dev
 WORKDIR /usr/src
 
 RUN apt-get update && apt-get install -y \
+    nano \
     git \
     curl \
     libpng-dev \
