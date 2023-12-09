@@ -91,7 +91,6 @@ jobs:
       - uses: actions/checkout@v3
       - name: Remove images
         run: |
-          chmod +x ./deployment/bin/remove-image.sh 
           ./deployment/bin/remove-image.sh rcarlos/devops-with-laravel-api ${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }} ${{ secrets.DOCKERHUB_PASSWORD }}
           ./deployment/bin/remove-image.sh rcarlos/devops-with-laravel-database ${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }} ${{ secrets.DOCKERHUB_PASSWORD }}
           ./deployment/bin/remove-image.sh rcarlos/devops-with-laravel-worker ${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }} ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -150,29 +149,19 @@ jobs:
           chmod 600 id_rsa
       - name: Deploy app
         run: |
-          # Transfer files
-          scp -v -C -o StrictHostKeyChecking=no -i ./id_rsa \
-          ./deployment/bin/deploy.sh \
-          ./docker-compose.prod.yml \
-          ./.env.prod.template \
-          ${{ secrets.SSH_CONNECTION_PROD }}:/usr/src/
-          
-          # give run permission to deploy.sh
-          ssh -v -tt -o StrictHostKeyChecking=no -i ./id_rsa ${{ secrets.SSH_CONNECTION_PROD }} "chmod +x /usr/src/deploy.sh"
-          
-          # Execute commands remotely
-          ssh -v -tt -o StrictHostKeyChecking=no -i ./id_rsa ${{ secrets.SSH_CONNECTION_PROD }} '
-          
-            # Create a temporary modified .env file
-            sed -e "s/IMAGE_TAG=.*/IMAGE_TAG=${{ github.sha }}/" \
-              -e "s/COMPOSE_PROJECT_NAME=.*/COMPOSE_PROJECT_NAME=devops-with-laravel/" \
-              -e "s/DOCKERHUB_USERNAME=.*/DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}/" \
-              -e "s/DOCKERHUB_PASSWORD=.*/DOCKERHUB_PASSWORD=${{ secrets.DOCKERHUB_PASSWORD }}/" \
-              -e "s/DB_PASSWORD=.*/DB_PASSWORD=${{ secrets.DB_PASSWORD }}/" \
-              -e "s/AWS_ACCESS_KEY_ID=.*/AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}/" \
-              -e "s/AWS_SECRET_ACCESS_KEY=.*/AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}/" \
-              -e "s/APP_KEY=.*/APP_KEY=${{ secrets.APP_KEY }}/" /usr/src/.env > /usr/src/.env.tmp
-          '
-          
-          # run deploy.sh
-          ssh -v -tt -o StrictHostKeyChecking=no -i ./id_rsa ${{ secrets.SSH_CONNECTION_PROD }} "/usr/src/deploy.sh"
+          scp -v -C -o StrictHostKeyChecking=no -i ./id_rsa ./deployment/bin/deploy.sh ${{ secrets.SSH_CONNECTION_PROD }}:/home/apprunner/deploy.sh
+          scp -v -C -o StrictHostKeyChecking=no -i ./id_rsa ./docker-compose.prod.yml ${{ secrets.SSH_CONNECTION_PROD }}:/usr/src/docker-compose.prod.yml
+          scp -v -C -o StrictHostKeyChecking=no -i ./id_rsa ./.env.prod.template ${{ secrets.SSH_CONNECTION_PROD }}:/usr/src/.env
+          ssh -v -tt -o StrictHostKeyChecking=no -i ./id_rsa ${{ secrets.SSH_CONNECTION_PROD }} "chmod +x /home/apprunner/deploy.sh"
+          ssh -v -tt -o StrictHostKeyChecking=no -i ./id_rsa ${{ secrets.SSH_CONNECTION_PROD }} "
+            sed -i "/IMAGE_TAG/c\IMAGE_TAG=${{ github.sha }}" /usr/src/.env
+            sed -i "/COMPOSE_PROJECT_NAME/c\COMPOSE_PROJECT_NAME=devops-with-laravel" /usr/src/.env
+
+            sed -i "/DOCKERHUB_USERNAME/c\DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" /usr/src/.env
+            sed -i "/DOCKERHUB_PASSWORD/c\DOCKERHUB_PASSWORD=${{ secrets.DOCKERHUB_PASSWORD }}" /usr/src/.env
+
+            sed -i "/DB_PASSWORD/c\DB_PASSWORD=${{ secrets.DB_PASSWORD }}" /usr/src/.env
+            sed -i "/AWS_ACCESS_KEY_ID/c\AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" /usr/src/.env
+            sed -i "/AWS_SECRET_ACCESS_KEY/c\AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" /usr/src/.env
+            sed -i "/APP_KEY/c\APP_KEY=${{ secrets.APP_KEY }}" /usr/src/.env"
+          ssh -v -tt -o StrictHostKeyChecking=no -i ./id_rsa ${{ secrets.SSH_CONNECTION_PROD }} "/home/apprunner/deploy.sh"
