@@ -40,7 +40,6 @@ RUN if [ "$ENV" = "dev" ]; then \
     fi
 
 RUN php artisan storage:link --force && \
-    chmod +x ./update.sh && \
     chmod +x ./wait-for-it.sh && \
     chown -R www-data:www-data /usr/src && \
     chmod -R 775 ./storage ./bootstrap/cache
@@ -50,15 +49,18 @@ RUN php artisan storage:link --force && \
 RUN mkdir -p /var/www/.config/psysh && \
         chown -R www-data:www-data /var/www/.config/psysh
 
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install
+
+# Add AWS CLI executable to the PATH
+ENV PATH="/root/.local/bin:${PATH}"
+
 USER www-data
 
 EXPOSE 9000
 CMD ["php-fpm"]
 
-#RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
-#    unzip awscliv2.zip && \
-#    ./aws/install
-#
 FROM api AS worker
 COPY ./deployment/config/supervisor/supervisord.conf /etc/supervisor/conf.d/supervisor.conf
 CMD ["/bin/sh", "-c", "supervisord -c /etc/supervisor/conf.d/supervisor.conf"]
