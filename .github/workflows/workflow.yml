@@ -91,6 +91,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Remove images
         run: |
+          chmod +x ./deployment/bin/remove-image.sh 
           ./deployment/bin/remove-image.sh rcarlos/devops-with-laravel-api ${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }} ${{ secrets.DOCKERHUB_PASSWORD }}
           ./deployment/bin/remove-image.sh rcarlos/devops-with-laravel-database ${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }} ${{ secrets.DOCKERHUB_PASSWORD }}
           ./deployment/bin/remove-image.sh rcarlos/devops-with-laravel-worker ${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }} ${{ secrets.DOCKERHUB_PASSWORD }}
