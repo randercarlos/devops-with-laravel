@@ -15,6 +15,30 @@ env:
   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
 jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build API Image
+        run: docker build -t $API_IMAGE --target=api -f ./api/Dockerfile .
+      - name: Run phpstan
+        run: docker run --rm -t $API_IMAGE ./vendor/bin/phpstan analyze --memory-limit=1G
+      - name: Run phpinsights
+        run: docker run --rm -t $API_IMAGE php artisan insights --no-interaction --min-quality=90 --min-complexity=90 --min-architecture=90 --min-style=90 --ansi --format=github-action
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build API Image
+        run: docker build -t $API_IMAGE --target=api -f ./api/Dockerfile .
+      - name: Build MySQL Image
+        run: docker build -t $MYSQL_IMAGE --build-arg password=${{ secrets.DB_PASSWORD }} -f ./Dockerfile.mysql .
+      - name: Run tests
+        run: |
+          docker-compose -f docker-compose.ci.yml up -d
+          docker-compose -f docker-compose.ci.yml exec -T api php artisan test
+
   build-backend-images:
     runs-on: ubuntu-latest
     steps:
@@ -46,56 +70,6 @@ jobs:
         run: docker build -t $MYSQL_IMAGE --build-arg password=${{ secrets.DB_PASSWORD }} -f ./Dockerfile.mysql .
       - name: Push Mysql image
         run: docker push $MYSQL_IMAGE
-
-  analyze:
-    needs: [build-backend-images, build-mysql]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Pull API image
-        run: docker pull $API_IMAGE
-      - name: Pull MySQL image
-        run: docker pull $MYSQL_IMAGE
-      - name: Run phpstan
-        run: docker run --rm -t $API_IMAGE ./vendor/bin/phpstan analyze --memory-limit=1G
-      - name: Run phpinsights
-        run: docker run --rm -t $API_IMAGE php artisan insights --no-interaction --min-quality=90 --min-complexity=90 --min-architecture=90 --min-style=90 --ansi --format=github-action
-
-  test:
-    needs: [ build-backend-images, build-mysql ]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Pull API image
-        run: docker pull $API_IMAGE
-      - name: Pull MySQL image
-        run: docker pull $MYSQL_IMAGE
-      - name: Run tests
-        run: |
-          docker-compose -f docker-compose.ci.yml up -d
-          docker-compose -f docker-compose.ci.yml exec -T api php artisan test
-
-  remove-images:
-    needs: [ analyze, test ]
-    runs-on: ubuntu-latest
-    if: ${{ always() && contains(needs.*.result, 'failure') }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Remove images
-        run: |
-          chmod +x ./deployment/bin/remove-image.sh
-          ./deployment/bin/remove-image.sh rcarlos/devops-with-laravel-api ${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }} ${{ secrets.DOCKERHUB_PASSWORD }}
-          ./deployment/bin/remove-image.sh rcarlos/devops-with-laravel-database ${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }} ${{ secrets.DOCKERHUB_PASSWORD }}
-          ./deployment/bin/remove-image.sh rcarlos/devops-with-laravel-worker ${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }} ${{ secrets.DOCKERHUB_PASSWORD }}
-          ./deployment/bin/remove-image.sh rcarlos/devops-with-laravel-scheduler ${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }} ${{ secrets.DOCKERHUB_PASSWORD }}
 
   build-nginx:
     needs: [ analyze, test ]
