@@ -72,11 +72,11 @@ jobs:
           docker build -t $API_IMAGE --target=api -f ./api/Dockerfile .
           docker build -t $SCHEDULER_IMAGE --target=scheduler -f ./api/Dockerfile .
           docker build -t $WORKER_IMAGE --target=worker -f ./api/Dockerfile .
-      - name: Push images
-        run: |
-          docker push $API_IMAGE
-          docker push $SCHEDULER_IMAGE
-          docker push $WORKER_IMAGE
+#      - name: Push images
+#        run: |
+#          docker push $API_IMAGE
+#          docker push $SCHEDULER_IMAGE
+#          docker push $WORKER_IMAGE
 
   build-mysql:
     runs-on: ubuntu-latest
@@ -88,8 +88,8 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Build MySQL image
         run: docker build -t $MYSQL_IMAGE --build-arg password=${{ secrets.DB_PASSWORD }} -f ./Dockerfile.mysql .
-      - name: Push Mysql image
-        run: docker push $MYSQL_IMAGE
+#      - name: Push Mysql image
+#        run: docker push $MYSQL_IMAGE
 
 #  remove-images:
 #    needs: [ analyze, test ]
@@ -116,7 +116,7 @@ jobs:
       - name: Build nginx image
         run: |
           docker build -t $NGINX_IMAGE -f ./Dockerfile.nginx .
-          docker push $NGINX_IMAGE
+#          docker push $NGINX_IMAGE
 
   build-proxy:
     needs: [ analyze, test ]
@@ -130,7 +130,7 @@ jobs:
       - name: Build nginx image
         run: |
           docker build -t $PROXY_IMAGE -f ./Dockerfile.proxy .
-          docker push $PROXY_IMAGE
+#          docker push $PROXY_IMAGE
 
   build-frontend:
     needs: [ analyze, test ]
@@ -144,6 +144,25 @@ jobs:
       - name: Build frontend image
         run: |
           docker build -t $FRONTEND_IMAGE --target=prod -f ./frontend/Dockerfile .
+#          docker push $FRONTEND_IMAGE
+
+  push-images:
+    needs: [ build-backend-images, build-mysql, analyze, test, build-nginx, build-proxy, build-frontend ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Push images
+        run: |
+          docker push $API_IMAGE
+          docker push $SCHEDULER_IMAGE
+          docker push $WORKER_IMAGE
+          docker push $MYSQL_IMAGE
+          docker push $NGINX_IMAGE
+          docker push $PROXY_IMAGE
           docker push $FRONTEND_IMAGE
 
 #  push-images:
