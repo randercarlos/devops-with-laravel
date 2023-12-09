@@ -162,15 +162,17 @@ jobs:
           
           # Execute commands remotely
           ssh -v -tt -o StrictHostKeyChecking=no -i ./id_rsa ${{ secrets.SSH_CONNECTION_PROD }} '
-            # Modify the .env file with all required changes in one sed command
-            sed -i.bak -e "s/IMAGE_TAG=.*/IMAGE_TAG=${{ github.sha }}/" \
-            -e "s/COMPOSE_PROJECT_NAME=.*/COMPOSE_PROJECT_NAME=devops-with-laravel/" \
-            -e "s/DOCKERHUB_USERNAME=.*/DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}/" \
-            -e "s/DOCKERHUB_PASSWORD=.*/DOCKERHUB_PASSWORD=${{ secrets.DOCKERHUB_PASSWORD }}/" \
-            -e "s/DB_PASSWORD=.*/DB_PASSWORD=${{ secrets.DB_PASSWORD }}/" \
-            -e "s/AWS_ACCESS_KEY_ID=.*/AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}/" \
-            -e "s/AWS_SECRET_ACCESS_KEY=.*/AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}/" \
-            -e "s/APP_KEY=.*/APP_KEY=${{ secrets.APP_KEY }}/" /usr/src/.env'
+          
+            # Create a temporary modified .env file
+            sed -e "s/IMAGE_TAG=.*/IMAGE_TAG=${{ github.sha }}/" \
+              -e "s/COMPOSE_PROJECT_NAME=.*/COMPOSE_PROJECT_NAME=devops-with-laravel/" \
+              -e "s/DOCKERHUB_USERNAME=.*/DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}/" \
+              -e "s/DOCKERHUB_PASSWORD=.*/DOCKERHUB_PASSWORD=${{ secrets.DOCKERHUB_PASSWORD }}/" \
+              -e "s/DB_PASSWORD=.*/DB_PASSWORD=${{ secrets.DB_PASSWORD }}/" \
+              -e "s/AWS_ACCESS_KEY_ID=.*/AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}/" \
+              -e "s/AWS_SECRET_ACCESS_KEY=.*/AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}/" \
+              -e "s/APP_KEY=.*/APP_KEY=${{ secrets.APP_KEY }}/" /usr/src/.env > /usr/src/.env.tmp
+          '
           
           # run deploy.sh
           ssh -v -tt -o StrictHostKeyChecking=no -i ./id_rsa ${{ secrets.SSH_CONNECTION_PROD }} "/usr/src/deploy.sh"
