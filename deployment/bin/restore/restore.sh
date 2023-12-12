@@ -2,7 +2,7 @@
 
 set -e
 
-BACKUP_FILENAME=$1
+S3_FULL_URI_BACKUP_FILENAME=$1
 MYSQL_USER=$2
 MYSQL_PASSWORD=$3
 
@@ -10,7 +10,7 @@ PROJECT_DIR="/usr/src"
 BACKUP_DIR=$PROJECT_DIR"/usr/src/storage/app/backup"
 
 cd $PROJECT_DIR
-sudo docker-compose -f docker-compose.prod.yml exec -T api aws s3 cp s3://devops-with-laravel-backups/$BACKUP_FILENAME $PROJECT_DIR"/storage/app/backup.zip"
+sudo docker-compose -f docker-compose.prod.yml exec -T api aws s3 cp $S3_FULL_URI_BACKUP_FILENAME $PROJECT_DIR"/storage/app/backup.zip"
 sudo docker-compose -f docker-compose.prod.yml exec -T api unzip -o $PROJECT_DIR"/storage/app/backup.zip" -d $BACKUP_DIR
 
 sudo docker-compose -f docker-compose.prod.yml exec -T api php $PROJECT_DIR"/artisan" down
