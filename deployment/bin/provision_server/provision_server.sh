@@ -20,6 +20,7 @@ if ! id "apprunner" >/dev/null 2>&1; then
     sudo bash -c 'echo "apprunner ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/apprunner'
 fi
 
+
 # Install docker
 sudo apt-get update -y
 sudo curl -fsSL https://get.docker.com/ | sh
@@ -30,3 +31,10 @@ docker --version
 sudo curl -L "https://github.com/docker/compose/releases/download/v2.19.1/docker-compose-linux-x86_64" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 docker-compose --version
+
+# Install AWS CLI
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install
+
+PATH="/root/.local/bin:${PATH}"

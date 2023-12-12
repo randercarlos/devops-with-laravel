@@ -39,8 +39,7 @@ RUN if [ "$ENV" = "dev" ]; then \
         composer install --optimize-autoloader --no-dev; \
     fi
 
-RUN php artisan storage:link --force && \
-    chmod +x ./wait-for-it.sh && \
+RUN chmod +x ./wait-for-it.sh && \
     chown -R www-data:www-data /usr/src && \
     chmod -R 775 ./storage ./bootstrap/cache
 
@@ -49,12 +48,11 @@ RUN php artisan storage:link --force && \
 RUN mkdir -p /var/www/.config/psysh && \
         chown -R www-data:www-data /var/www/.config/psysh
 
+# Install or update AWS CLI
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
-    unzip awscliv2.zip && \
-    ./aws/install
-
-# Add AWS CLI executable to the PATH
-ENV PATH="/root/.local/bin:${PATH}"
+    unzip -o awscliv2.zip && \
+    ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update && \
+    rm awscliv2.zip
 
 USER www-data
 
