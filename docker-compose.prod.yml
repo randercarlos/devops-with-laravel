@@ -26,6 +26,7 @@ services:
 #      - update
       - mysql
       - redis
+    env_file: .env
 
   scheduler:
     image: rcarlos/devops-with-laravel-scheduler:${IMAGE_TAG}
@@ -39,6 +40,7 @@ services:
 #      - update
       - mysql
       - redis
+    env_file: .env
 
   worker:
     image: rcarlos/devops-with-laravel-worker:${IMAGE_TAG}
@@ -52,6 +54,7 @@ services:
 #      - update
       - mysql
       - redis
+    env_file: .env
 
   nginx:
     image: rcarlos/devops-with-laravel-nginx:${IMAGE_TAG}
