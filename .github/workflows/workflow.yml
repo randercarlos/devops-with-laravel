@@ -114,7 +114,7 @@ jobs:
           docker build -t $FRONTEND_IMAGE --target=prod -f ./frontend/Dockerfile .
           docker push $FRONTEND_IMAGE
 
-  deploy-code-prod:
+  deploy-prod:
     needs: [ analyze-code, test-code, build-backend-images, build-database-image, build-frontend-image, build-nginx-image, build-proxy-image ]
     runs-on: ubuntu-latest
     steps:
@@ -139,5 +139,11 @@ jobs:
             sed -i "/DB_PASSWORD/c\DB_PASSWORD=${{ secrets.DB_PASSWORD }}" /usr/src/.env
             sed -i "/AWS_ACCESS_KEY_ID/c\AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" /usr/src/.env
             sed -i "/AWS_SECRET_ACCESS_KEY/c\AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" /usr/src/.env
+            sed -i "/AWS_DEFAULT_REGION/c\AWS_DEFAULT_REGION=${{ secrets.AWS_DEFAULT_REGION }}" /usr/src/.env
             sed -i "/APP_KEY/c\APP_KEY=${{ secrets.APP_KEY }}" /usr/src/.env"
           ssh -v -tt -o StrictHostKeyChecking=no -i ./id_rsa ${{ secrets.SSH_CONNECTION_PROD }} "/home/apprunner/deploy.sh"
+
+#      - name: Configure AWS
+#        run: |
+#          echo "${{ secrets.SSH_KEY }}" >> ./id_rsa
+#          chmod 600 id_rsa
