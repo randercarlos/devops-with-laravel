@@ -1,6 +1,7 @@
 version: "3.8"
 services:
   proxy:
+    container_name: proxy
     image: rcarlos/devops-with-laravel-proxy:${IMAGE_TAG}
     restart: unless-stopped
     ports:
@@ -10,10 +11,12 @@ services:
       - nginx
 
   frontend:
+    container_name: frontend
     image: rcarlos/devops-with-laravel-frontend:${IMAGE_TAG}
     restart: unless-stopped
 
   api:
+    container_name: api
     image: rcarlos/devops-with-laravel-api:${IMAGE_TAG}
     command: sh -c "./wait-for-it.sh mysql:3306 -t 30 && ./wait-for-it.sh redis:6379 -t 30 && php-fpm"
     restart: unless-stopped
@@ -26,9 +29,10 @@ services:
 #      - update
       - mysql
       - redis
-    env_file: .env
+    env_file: .env # read .env containing AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY,  AWS_DEFAULT_REGION and others
 
   scheduler:
+    container_name: scheduler
     image: rcarlos/devops-with-laravel-scheduler:${IMAGE_TAG}
     restart: unless-stopped
     volumes:
@@ -40,9 +44,10 @@ services:
 #      - update
       - mysql
       - redis
-    env_file: .env
+    env_file: .env # read .env containing AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY,  AWS_DEFAULT_REGION and others
 
   worker:
+    container_name: worker
     image: rcarlos/devops-with-laravel-worker:${IMAGE_TAG}
     restart: unless-stopped
     volumes:
@@ -54,15 +59,17 @@ services:
 #      - update
       - mysql
       - redis
-    env_file: .env
+    env_file: .env # read .env containing AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY,  AWS_DEFAULT_REGION and others
 
   nginx:
+    container_name: nginx
     image: rcarlos/devops-with-laravel-nginx:${IMAGE_TAG}
     restart: unless-stopped
     depends_on:
       - api
 
   mysql:
+    container_name: mysql
     image: rcarlos/devops-with-laravel-database:${IMAGE_TAG}
     restart: unless-stopped
     volumes:
@@ -73,6 +80,7 @@ services:
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
 
   redis:
+    container_name: redis
     image: redis:7.0.11-alpine
     restart: unless-stopped
     volumes:
