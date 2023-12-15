@@ -9,3 +9,4 @@ redisdata
 mysqldata
 .env
 id_rsa
+mysql-posts.sql

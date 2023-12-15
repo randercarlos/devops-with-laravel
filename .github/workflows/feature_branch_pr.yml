@@ -1,0 +1,148 @@
+name: Feature branch PR
+
+on:
+  pull_request:
+    branches: [ "develop" ]
+
+env:
+  API_IMAGE: martinjoo/posts-api:${{ github.sha }}
+  SCHEDULER_IMAGE: martinjoo/posts-scheduler:${{ github.sha }}
+  WORKER_IMAGE: martinjoo/posts-worker:${{ github.sha }}
+  NGINX_IMAGE: martinjoo/posts-nginx:${{ github.sha }}
+  PROXY_IMAGE: martinjoo/posts-proxy:${{ github.sha }}
+  MYSQL_IMAGE: martinjoo/posts-mysql:${{ github.sha }}
+  FRONTEND_IMAGE: martinjoo/posts-frontend:${{ github.sha }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
+jobs:
+  build-backend-images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/jobs/build-backend-images
+        with:
+          dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  build-mysql:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/jobs/build-mysql
+        with:
+          dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
+          db-password: ${{ secrets.DB_PASSWORD }}
+
+  analyze:
+    needs: [build-backend-images, build-mysql]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/jobs/analyze
+        with:
+          dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  test:
+    needs: [ build-backend-images, build-mysql ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/jobs/test
+        with:
+          dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub-token: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  remove-images:
+    needs: [ analyze, test ]
+    runs-on: ubuntu-latest
+    if: ${{ always() && contains(needs.*.result, 'failure') }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/jobs/remove-images
+        with:
+          dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub-token: ${{ secrets.DOCKERHUB_PASSWORD }}
+          image-tag: ${{ github.sha }}
+
+  provision-demo-server:
+      needs: [ analyze, test ]
+      runs-on: ubuntu-latest
+      outputs:
+        demo_server_ip: ${{ steps.create-demo-server.outputs.SERVER_IP }}
+      steps:
+        - uses: actions/checkout@v3
+        - uses: docker/login-action@v2
+          with:
+            username: ${{ secrets.DOCKERHUB_USERNAME }}
+            password: ${{ secrets.DOCKERHUB_TOKEN }}
+        - name: Copy SSH key
+          run: |
+            echo "${{ secrets.SSH_KEY }}" >> ./id_rsa
+            chmod 600 ./id_rsa
+        - name: Create demo server
+          id: create-demo-server
+          run: |
+            cp ./deployment/bin/provision_server/provision_server.sh .
+            SERVER_NAME=$(echo $GITHUB_HEAD_REF | sed 's/.*\///')
+            SERVER_IP=$(./deployment/bin/provision_server/run_provision_server_from_pipeline.sh $SERVER_NAME ${{ secrets.DOCTL_TOKEN }} "$(pwd)")
+            echo "$SERVER_IP" >> "$GITHUB_OUTPUT"
+
+  build-nginx:
+    needs: [ provision-demo-server ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/jobs/build-nginx
+        with:
+          dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub-token: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+  build-proxy:
+    needs: [ provision-demo-server ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/jobs/build-proxy
+        with:
+          dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub-token: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+  build-frontend:
+    needs: [ provision-demo-server ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/jobs/build-frontend
+        with:
+          dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub-token: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+  deploy-demo:
+    needs: [ build-frontend, build-nginx, build-proxy ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Copy SSH key
+        run: |
+          echo "${{ secrets.SSH_KEY }}" >> ./id_rsa
+          chmod 600 id_rsa
+      - name: Deploy app
+        run: |
+          SSH_CONNECTION_DEMO=root@${{ needs.provision-demo-server.outputs.demo_server_ip }}
+          scp -C -o StrictHostKeyChecking=no -i ./id_rsa ./deployment/bin/deploy.sh $SSH_CONNECTION_DEMO:/home/martin/deploy.sh
+          scp -C -o StrictHostKeyChecking=no -i ./id_rsa ./docker-compose.prod.yml $SSH_CONNECTION_DEMO:/usr/src/docker-compose.prod.yml
+          scp -C -o StrictHostKeyChecking=no -i ./id_rsa ./.env.prod.template $SSH_CONNECTION_DEMO:/usr/src/.env
+          ssh -tt -o StrictHostKeyChecking=no -i ./id_rsa $SSH_CONNECTION_DEMO "
+            sed -i '/IMAGE_TAG/c\IMAGE_TAG=${{ github.sha }}' /usr/src/.env
+
+            sed -i '/AWS_ACCESS_KEY_ID/c\AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}' /usr/src/.env
+            sed -i '/AWS_SECRET_ACCESS_KEY/c\AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}' /usr/src/.env
+            sed -i "/AWS_BUCKET/c\AWS_BUCKET=devops-with-laravel-demo-backups" /usr/src/.env
+
+            sed -i '/DB_PASSWORD/c\DB_PASSWORD=${{ secrets.DB_PASSWORD }}' /usr/src/.env
+
+            sed -i '/APP_KEY/c\APP_KEY=${{ secrets.APP_KEY }}' /usr/src/.env
+            sed -i '/APP_URL/c\APP_URL=${{ needs.provision-demo-server.outputs.demo_server_ip }}' /usr/src/.env"
+          ssh -tt -o StrictHostKeyChecking=no -i ./id_rsa $SSH_CONNECTION_DEMO "chmod +x /home/martin/deploy.sh && /home/martin/deploy.sh"
