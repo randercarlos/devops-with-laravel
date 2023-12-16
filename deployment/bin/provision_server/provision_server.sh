@@ -23,6 +23,7 @@ fi
 
 # Install docker
 sudo apt-get update -y
+sudo apt-get install unzip -y
 sudo curl -fsSL https://get.docker.com/ | sh
 sudo usermod -aG docker apprunner
 docker --version
@@ -33,8 +34,15 @@ sudo chmod +x /usr/local/bin/docker-compose
 docker-compose --version
 
 # Install AWS CLI
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
-    unzip awscliv2.zip && \
-    ./aws/install
+sudo curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip -o awscliv2.zip
+sudo ./aws/install --update
+sudo rm -f awscliv2.zip
 
 PATH="/root/.local/bin:${PATH}"
+
+# Definindo códigos de cor ANSI
+verde='\033[0;32m'
+reset='\033[0m'
+
+echo -e "${verde}Provision was successfully executed!${reset}"
