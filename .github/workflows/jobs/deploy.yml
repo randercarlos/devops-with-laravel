@@ -28,6 +28,9 @@ inputs:
   app-key:
     description: 'App key'
     required: true
+  app-env:
+    description: 'App env'
+    required: true
 
 runs:
   using: "composite"
@@ -54,5 +57,6 @@ runs:
           sed -i "/DB_PASSWORD/c\DB_PASSWORD=${{ inputs.db-password }}" /usr/src/.env
 
           sed -i "/APP_KEY/c\APP_KEY=${{ inputs.app-key }}" /usr/src/.env"
+          sed -i "/APP_ENV/c\APP_ENV=${{ inputs.app-env }}" /usr/src/.env"
         ssh -tt -o StrictHostKeyChecking=no -i ./id_rsa ${{ inputs.ssh-connection }} "/home/apprunner/deploy.sh"
       shell: bash
