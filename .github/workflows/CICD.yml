@@ -147,7 +147,7 @@ jobs:
     environment: staging
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/workflows/jobs/deploy.yml
+      - uses: ./.github/workflows/jobs/deploy
         with:
           ssh-key: ${{ secrets.SSH_KEY }}
           ssh-connection: ${{ secrets.SSH_CONNECTION_STAGING }}
@@ -168,7 +168,7 @@ jobs:
     environment: prod
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/workflows/jobs/deploy.yml
+      - uses: ./.github/workflows/jobs/deploy
         with:
           ssh-key: ${{ secrets.SSH_KEY }}
           ssh-connection: ${{ secrets.SSH_CONNECTION_STAGING }}
