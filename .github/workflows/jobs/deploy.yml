@@ -36,7 +36,6 @@ jobs:
         description: 'App env'
         required: true
     steps:
-      - uses: actions/checkout@v3
       - name: Copy SSH key
         run: |
           echo "${{ inputs.ssh-key }}" >> ./id_rsa
