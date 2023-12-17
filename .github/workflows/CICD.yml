@@ -1,4 +1,4 @@
-name: CI/CD
+name: CI/CD Workflow
 
 on:
   push:
@@ -19,6 +19,7 @@ env:
 
 jobs:
   analyze-code:
+    name: Analyze Code
     runs-on: ubuntu-latest
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'staging' }}
@@ -32,6 +33,7 @@ jobs:
         run: docker run --rm -t $API_IMAGE php artisan insights --no-interaction --min-quality=90 --min-complexity=90 --min-architecture=90 --min-style=90 --ansi --format=github-action
 
   test-code:
+    name: Test Code
     needs: [ analyze-code]
     runs-on: ubuntu-latest
     environment:
@@ -47,6 +49,7 @@ jobs:
           docker run --rm -t $API_IMAGE php artisan test
 
   build-backend-images:
+    name: Build Backend
     needs: [ analyze-code, test-code ]
     runs-on: ubuntu-latest
     environment:
@@ -69,6 +72,7 @@ jobs:
           docker push $WORKER_IMAGE
 
   build-database-image:
+    name: Build Database
     needs: [ analyze-code, test-code ]
     runs-on: ubuntu-latest
     environment:
@@ -85,6 +89,7 @@ jobs:
         run: docker push $MYSQL_IMAGE
 
   build-nginx-image:
+    name: Build Nginx
     needs: [ analyze-code, test-code ]
     runs-on: ubuntu-latest
     environment:
@@ -101,6 +106,7 @@ jobs:
           docker push $NGINX_IMAGE
 
   build-proxy-image:
+    name: Build Proxy
     needs: [ analyze-code, test-code ]
     runs-on: ubuntu-latest
     environment:
@@ -117,6 +123,7 @@ jobs:
           docker push $PROXY_IMAGE
 
   build-frontend-image:
+    name: Build Frontend
     needs: [ analyze-code, test-code ]
     runs-on: ubuntu-latest
     environment:
@@ -133,13 +140,14 @@ jobs:
           docker push $FRONTEND_IMAGE
 
   deploy-staging:
+    name: Deploy / Staging
     needs: [ analyze-code, test-code, build-backend-images, build-database-image, build-frontend-image, build-nginx-image, build-proxy-image ]
     if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     environment: staging
     steps:
       - uses: actions/checkout@v3
-      - uses: deploy:./.github/workflows/jobs/deploy.yml
+      - uses: ./.github/workflows/jobs/deploy.yml
         with:
           ssh-key: ${{ secrets.SSH_KEY }}
           ssh-connection: ${{ secrets.SSH_CONNECTION_STAGING }}
@@ -153,6 +161,7 @@ jobs:
           app-key: ${{ secrets.APP_KEY }}
 
   deploy-prod:
+    name: Deploy / Production
     needs: [ analyze-code, test-code, build-backend-images, build-database-image, build-frontend-image, build-nginx-image, build-proxy-image ]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
