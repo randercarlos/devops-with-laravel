@@ -19,7 +19,7 @@ class SendPostPublishedNotifications implements ShouldQueue
     {
         User::where('id', '!=', $event->post->author->id)
             ->get()
-            ->when(\App::environment('local'), function (Collection $collection) {
+            ->when(true, function (Collection $collection) {
                 return $collection->take(5);
             })
 //                ->each
