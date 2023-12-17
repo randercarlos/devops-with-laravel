@@ -1,8 +1,11 @@
-name: CI/CD on Push Branch
+name: CI/CD
 
 on:
   push:
-    branches: [ "develop", "main", "master" ]
+    branches: [ "develop", "main" ]
+
+  pull_request:
+    branches: [ "develop", "main" ]
 
 env:
   API_IMAGE: rcarlos/devops-with-laravel-api:${{ github.sha }}
@@ -136,7 +139,7 @@ jobs:
     environment: staging
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/workflows/jobs/deploy.yml
+      - uses: deploy:./.github/workflows/jobs/deploy.yml
         with:
           ssh-key: ${{ secrets.SSH_KEY }}
           ssh-connection: ${{ secrets.SSH_CONNECTION_STAGING }}
@@ -156,7 +159,7 @@ jobs:
     environment: prod
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/workflows/jobs/deploy.yml
+      - uses: deploy:./.github/workflows/jobs/deploy.yml
         with:
           ssh-key: ${{ secrets.SSH_KEY }}
           ssh-connection: ${{ secrets.SSH_CONNECTION_STAGING }}
