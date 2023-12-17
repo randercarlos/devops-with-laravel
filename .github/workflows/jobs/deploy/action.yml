@@ -44,6 +44,9 @@ runs:
         echo "${{ inputs.ssh-key }}" >> ./id_rsa
         chmod 600 id_rsa
       shell: bash
+    - name: Debug SSH Connection
+      run: |
+        echo "SSH Connection: ${{ inputs.ssh-connection }}"
     - name: Deploy app
       run: |
         scp -C -o StrictHostKeyChecking=no -i ./id_rsa ./deployment/bin/deploy.sh ${{ inputs.ssh-connection }}:/home/apprunner/deploy.sh
