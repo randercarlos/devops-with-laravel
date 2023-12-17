@@ -1,8 +1,11 @@
-name: CI/CD on Push Branch
+name: CI/CD
 
 on:
   push:
-    branches: [ "develop", "main", "master" ]
+    branches: [ "develop", "main" ]
+
+  pull_request:
+    branches: [ "develop", "main" ]
 
 env:
   API_IMAGE: rcarlos/devops-with-laravel-api:${{ github.sha }}
