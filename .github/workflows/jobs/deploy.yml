@@ -1,45 +1,43 @@
-name: Deploy
+name: 'Deploy'
+description: 'Deploy a server'
+inputs:
+  ssh-key:
+    description: 'Content of the private SSH key'
+    required: true
+  ssh-connection:
+    description: 'SSH connection string'
+    required: true
+  image-tag:
+    description: 'Docker image tag'
+    required: true
+  aws-access-key:
+    description: 'AWS access key'
+    required: true
+  aws-secret-access-key:
+    description: 'AWS secret access key'
+    required: true
+  aws-default-region:
+    description: 'AWS default region'
+    required: true
+  aws-bucket:
+    description: 'AWS bucket name'
+    required: true
+  db-user:
+    description: 'DB user'
+    required: true
+  db-password:
+    description: 'DB password'
+    required: true
+  app-key:
+    description: 'App key'
+    required: true
+  app-env:
+    description: 'App env'
+    required: true
 
-on:
-  workflow_call:
-    inputs:
-      ssh-key:
-        description: 'Content of the private SSH key'
-        required: true
-      ssh-connection:
-        description: 'SSH connection string'
-        required: true
-      image-tag:
-        description: 'Docker image tag'
-        required: true
-      aws-access-key:
-        description: 'AWS access key'
-        required: true
-      aws-secret-access-key:
-        description: 'AWS secret access key'
-        required: true
-      aws-default-region:
-        description: 'AWS default region'
-        required: true
-      aws-bucket:
-        description: 'AWS bucket name'
-        required: true
-      db-user:
-        description: 'DB user'
-        required: true
-      db-password:
-        description: 'DB password'
-        required: true
-      app-key:
-        description: 'App key'
-        required: true
-      app-env:
-        description: 'App env'
-        required: true
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+runs:
+  using: "composite"
+  steps:
     steps:
       - uses: actions/checkout@v3
       - name: Copy SSH key
