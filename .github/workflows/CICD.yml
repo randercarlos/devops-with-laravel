@@ -150,7 +150,7 @@ jobs:
       - uses: ./.github/workflows/jobs/deploy
         with:
           ssh-key: ${{ secrets.SSH_KEY }}
-          ssh-connection: ${{ secrets.SSH_CONNECTION_STAGING }}
+          ssh-connection: ${{ secrets.SSH_CONNECTION }}
           image-tag: ${{ github.sha }}
           aws-access-key: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -171,12 +171,12 @@ jobs:
       - uses: ./.github/workflows/jobs/deploy
         with:
           ssh-key: ${{ secrets.SSH_KEY }}
-          ssh-connection: ${{ secrets.SSH_CONNECTION_STAGING }}
+          ssh-connection: ${{ secrets.SSH_CONNECTION }}
           image-tag: ${{ github.sha }}
           aws-access-key: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-default-region: ${{ secrets.AWS_DEFAULT_REGION }}
-          aws-bucket: devops-with-laravel-staging-backups
+          aws-bucket: devops-with-laravel-bucket
           db-password: ${{ secrets.DB_PASSWORD }}
           app-key: ${{ secrets.APP_KEY }}
           app-env: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
