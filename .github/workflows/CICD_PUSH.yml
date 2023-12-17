@@ -29,6 +29,7 @@ jobs:
         run: docker run --rm -t $API_IMAGE php artisan insights --no-interaction --min-quality=90 --min-complexity=90 --min-architecture=90 --min-style=90 --ansi --format=github-action
 
   test-code:
+    needs: [ analyze-code]
     runs-on: ubuntu-latest
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'staging' }}
@@ -83,6 +84,8 @@ jobs:
   build-nginx-image:
     needs: [ analyze-code, test-code ]
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'staging' }}
     steps:
       - uses: actions/checkout@v3
       - uses: docker/login-action@v2
