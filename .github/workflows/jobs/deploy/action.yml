@@ -63,5 +63,5 @@ runs:
         
           sed -i "/APP_KEY/c\APP_KEY=${{ inputs.app-key }}" /usr/src/.env
           sed -i "/APP_ENV/c\APP_ENV=${{ inputs.app-env }}" /usr/src/.env"
-        ssh -v -tt -o StrictHostKeyChecking=no -i ./id_rsa ${{ secrets.SSH_CONNECTION }} "/home/apprunner/deploy.sh"
+        ssh -v -tt -o StrictHostKeyChecking=no -i ./id_rsa ${{ inputs.ssh-connection }} "/home/apprunner/deploy.sh"
       shell: bash
