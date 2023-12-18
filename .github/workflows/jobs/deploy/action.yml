@@ -42,10 +42,12 @@ runs:
     - name: Copy SSH key
       run: |
         echo "${{ inputs.ssh-key }}" >> ./id_rsa
-        chmod 777 ./id_rsa
+        chmod 600 id_rsa
       shell: bash
     - name: Deploy app
       run: |
+        echo "${{ inputs.ssh-key }}" >> ./id_rsa
+        chmod 600 id_rsa
         scp -v -C -o StrictHostKeyChecking=no -i ./id_rsa ./deployment/bin/deploy.sh ${{ inputs.ssh-connection }}:/home/apprunner/deploy.sh
         scp -v -C -o StrictHostKeyChecking=no -i ./id_rsa ./docker-compose.prod.yml ${{ inputs.ssh-connection }}:/usr/src/docker-compose.prod.yml
         scp -v -C -o StrictHostKeyChecking=no -i ./id_rsa ./.env.prod.template ${{ inputs.ssh-connection }}:/usr/src/.env
