@@ -42,7 +42,7 @@ runs:
     - name: Copy SSH key
       run: |
         echo "${{ inputs.ssh-key }}" >> ./id_rsa
-        chmod 600 id_rsa
+        chmod 600 ./id_rsa
       shell: bash
     - name: Debug SSH Connection
       run: |
