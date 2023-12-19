@@ -46,13 +46,12 @@ runs:
       shell: bash
     - name: Deploy app
       run: |
-        echo "${{ inputs.ssh-key }}" >> ./id_rsa
-        chmod 600 id_rsa
         scp -v -C -o StrictHostKeyChecking=no -i ./id_rsa ./deployment/bin/deploy.sh ${{ inputs.ssh-connection }}:/home/apprunner/deploy.sh
         scp -v -C -o StrictHostKeyChecking=no -i ./id_rsa ./docker-compose.prod.yml ${{ inputs.ssh-connection }}:/usr/src/docker-compose.prod.yml
         scp -v -C -o StrictHostKeyChecking=no -i ./id_rsa ./.env.prod.template ${{ inputs.ssh-connection }}:/usr/src/.env
         ssh -v -tt -o StrictHostKeyChecking=no -i ./id_rsa ${{ inputs.ssh-connection }} "chmod +x /home/apprunner/deploy.sh"
-        ssh -v -tt -o StrictHostKeyChecking=no -i ./id_rsa ${{ inputs.ssh-connection }} "
+        ssh -v -tt -o StrictHostKeyChecking=no -i ./id_rsa ${{ inputs.ssh-connection }}
+        "
           sed -i "/IMAGE_TAG/c\IMAGE_TAG=${{ inputs.image-tag }}" /usr/src/.env
         
           sed -i "/AWS_ACCESS_KEY_ID/c\AWS_ACCESS_KEY_ID=${{ inputs.aws-access-key }}" /usr/src/.env
@@ -64,6 +63,7 @@ runs:
           sed -i "/DB_PASSWORD/c\DB_PASSWORD=${{ inputs.db-password }}" /usr/src/.env
         
           sed -i "/APP_KEY/c\APP_KEY=${{ inputs.app-key }}" /usr/src/.env
-          sed -i "/APP_ENV/c\APP_ENV=${{ inputs.app-env }}" /usr/src/.env"
+          sed -i "/APP_ENV/c\APP_ENV=${{ inputs.app-env }}" /usr/src/.env
+        "
         ssh -v -tt -o StrictHostKeyChecking=no -i ./id_rsa ${{ inputs.ssh-connection }} "/home/apprunner/deploy.sh"
       shell: bash
