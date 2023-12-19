@@ -156,7 +156,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-default-region: ${{ secrets.AWS_DEFAULT_REGION }}
           aws-bucket: devops-with-laravel-bucket
-          db-user: ${{ secrets.DB_USER }}
+          db-username: ${{ secrets.DB_USERNAME }}
           db-password: ${{ secrets.DB_PASSWORD }}
           app-key: ${{ secrets.APP_KEY }}
           app-env: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
@@ -178,7 +178,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-default-region: ${{ secrets.AWS_DEFAULT_REGION }}
           aws-bucket: devops-with-laravel-bucket
-          db-user: ${{ secrets.DB_USER }}
+          db-username: ${{ secrets.DB_USERNAME }}
           db-password: ${{ secrets.DB_PASSWORD }}
           app-key: ${{ secrets.APP_KEY }}
           app-env: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}

@@ -22,8 +22,8 @@ inputs:
   aws-bucket:
     description: 'AWS bucket name'
     required: true
-  db-user:
-    description: 'DB user'
+  db-username:
+    description: 'DB username'
     required: true
   db-password:
     description: 'DB password'
@@ -58,7 +58,7 @@ runs:
           sed -i "/AWS_BUCKET/c\AWS_BUCKET=${{ inputs.aws-bucket }}" /usr/src/.env
           sed -i "/AWS_DEFAULT_REGION/c\AWS_DEFAULT_REGION=${{ inputs.aws-default-region }}" /usr/src/.env
         
-          sed -i "/DB_USER/c\DB_USER=${{ inputs.db-user }}" /usr/src/.env
+          sed -i "/DB_USERNAME/c\DB_USER=${{ inputs.db-username }}" /usr/src/.env
           sed -i "/DB_PASSWORD/c\DB_PASSWORD=${{ inputs.db-password }}" /usr/src/.env
         
           sed -i "/APP_KEY/c\APP_KEY=${{ inputs.app-key }}" /usr/src/.env
