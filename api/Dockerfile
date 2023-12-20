@@ -41,7 +41,7 @@ RUN if [ "$ENV" = "dev" ]; then \
 
 RUN chmod +x ./wait-for-it.sh && \
     chown -R www-data:www-data /usr/src && \
-    chmod -R 775 ./storage ./bootstrap/cache
+    chmod -R 775 /usr/src/storage /usr/src/bootstrap/cache
 
 
 # allow run "php artisan tinker" inside the container without error
