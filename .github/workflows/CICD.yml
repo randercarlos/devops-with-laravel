@@ -52,6 +52,7 @@ jobs:
     name: Build Backend
     needs: [ analyze-code, test-code ]
     runs-on: ubuntu-latest
+    if: github.event_name == 'push'
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'staging' }}
     steps:
@@ -75,6 +76,7 @@ jobs:
     name: Build Database
     needs: [ analyze-code, test-code ]
     runs-on: ubuntu-latest
+    if: github.event_name == 'push'
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'staging' }}
     steps:
@@ -92,6 +94,7 @@ jobs:
     name: Build Nginx
     needs: [ analyze-code, test-code ]
     runs-on: ubuntu-latest
+    if: github.event_name == 'push'
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'staging' }}
     steps:
@@ -109,6 +112,7 @@ jobs:
     name: Build Proxy
     needs: [ analyze-code, test-code ]
     runs-on: ubuntu-latest
+    if: github.event_name == 'push'
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'staging' }}
     steps:
@@ -126,6 +130,7 @@ jobs:
     name: Build Frontend
     needs: [ analyze-code, test-code ]
     runs-on: ubuntu-latest
+    if: github.event_name == 'push'
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'staging' }}
     steps:
@@ -142,7 +147,7 @@ jobs:
   deploy-staging:
     name: Deploy / Staging
     needs: [ analyze-code, test-code, build-backend-images, build-database-image, build-frontend-image, build-nginx-image, build-proxy-image ]
-    if: github.ref == 'refs/heads/develop'
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push' # branch develop and push. not PR.
     runs-on: ubuntu-latest
     environment: staging
     steps:
@@ -164,7 +169,7 @@ jobs:
   deploy-prod:
     name: Deploy / Production
     needs: [ analyze-code, test-code, build-backend-images, build-database-image, build-frontend-image, build-nginx-image, build-proxy-image ]
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' # branch main and push. not PR.
     runs-on: ubuntu-latest
     environment: prod
     steps:
