@@ -4,8 +4,7 @@ set -e
 
 cd /usr/src
 
-
-sudo docker image prune -f --filter "until=48h" # remove images old more 2 days or more. Free space. Optional
+sudo docker image prune -af
 sudo docker-compose -f docker-compose.prod.yml down --remove-orphans
 sudo docker-compose -f docker-compose.prod.yml up -d
 
