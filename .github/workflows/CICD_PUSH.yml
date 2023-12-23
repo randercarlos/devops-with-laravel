@@ -4,9 +4,6 @@ on:
   push:
     branches: [ "develop", "main" ]
 
-  pull_request:
-    branches: [ "develop", "main" ]
-
 env:
   API_IMAGE: rcarlos/devops-with-laravel-api:${{ github.sha }}
   SCHEDULER_IMAGE: rcarlos/devops-with-laravel-scheduler:${{ github.sha }}
@@ -52,6 +49,7 @@ jobs:
     name: Build Backend
     needs: [ analyze-code, test-code ]
     runs-on: ubuntu-latest
+    if: github.event_name == 'push'
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'staging' }}
     steps:
