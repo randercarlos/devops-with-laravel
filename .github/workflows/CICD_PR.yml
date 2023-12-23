@@ -1,8 +1,8 @@
 name: CI/CD Workflow
 
 on:
-  pull_request: # considera qualquer branch in qualquer status
-    types: [ opened, synchronize, reopened, closed, labeled, unlabeled ]
+  pull_request: # qualquer branch ao abrir PR e atualizar o PR
+    types: [ opened, synchronize ]
 
 env:
   API_IMAGE: rcarlos/devops-with-laravel-api:${{ github.sha }}
