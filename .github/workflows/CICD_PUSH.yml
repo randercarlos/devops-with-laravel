@@ -19,7 +19,7 @@ jobs:
     name: Analyze Code
     runs-on: ubuntu-latest
     environment:
-      name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'staging' }}
+      name: ${{ github.base_ref == 'refs/heads/main' && 'prod' || 'staging' }}
     steps:
       - uses: actions/checkout@v3
       - name: Build API Image
@@ -34,7 +34,7 @@ jobs:
     needs: [ analyze-code]
     runs-on: ubuntu-latest
     environment:
-      name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'staging' }}
+      name: ${{ github.base_ref == 'refs/heads/main' && 'prod' || 'staging' }}
     steps:
       - uses: actions/checkout@v3
       - name: Build API Image
@@ -51,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
     environment:
-      name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'staging' }}
+      name: ${{ github.base_ref == 'refs/heads/main' && 'prod' || 'staging' }}
     steps:
       - uses: actions/checkout@v3
       - uses: docker/login-action@v2
@@ -74,7 +74,7 @@ jobs:
     needs: [ analyze-code, test-code ]
     runs-on: ubuntu-latest
     environment:
-      name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'staging' }}
+      name: ${{ github.base_ref == 'refs/heads/main' && 'prod' || 'staging' }}
     steps:
       - uses: actions/checkout@v3
       - uses: docker/login-action@v2
@@ -91,7 +91,7 @@ jobs:
     needs: [ analyze-code, test-code ]
     runs-on: ubuntu-latest
     environment:
-      name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'staging' }}
+      name: ${{ github.base_ref == 'refs/heads/main' && 'prod' || 'staging' }}
     steps:
       - uses: actions/checkout@v3
       - uses: docker/login-action@v2
@@ -108,7 +108,7 @@ jobs:
     needs: [ analyze-code, test-code ]
     runs-on: ubuntu-latest
     environment:
-      name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'staging' }}
+      name: ${{ github.base_ref == 'refs/heads/main' && 'prod' || 'staging' }}
     steps:
       - uses: actions/checkout@v3
       - uses: docker/login-action@v2
@@ -125,7 +125,7 @@ jobs:
     needs: [ analyze-code, test-code ]
     runs-on: ubuntu-latest
     environment:
-      name: ${{ github.ref == 'refs/heads/main' && 'prod' || 'staging' }}
+      name: ${{ github.base_ref == 'refs/heads/main' && 'prod' || 'staging' }}
     steps:
       - uses: actions/checkout@v3
       - uses: docker/login-action@v2
@@ -140,7 +140,7 @@ jobs:
   deploy-staging:
     name: Deploy / Staging
     needs: [ analyze-code, test-code, build-backend-images, build-database-image, build-frontend-image, build-nginx-image, build-proxy-image ]
-    if: github.ref == 'refs/heads/develop'
+    if: github.base_ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     environment: staging
     steps:
@@ -157,12 +157,12 @@ jobs:
           db-username: ${{ secrets.DB_USERNAME }}
           db-password: ${{ secrets.DB_PASSWORD }}
           app-key: ${{ secrets.APP_KEY }}
-          app-env: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+          app-env: ${{ github.base_ref == 'refs/heads/main' && 'production' || 'staging' }}
 
   deploy-prod:
     name: Deploy / Production
     needs: [ analyze-code, test-code, build-backend-images, build-database-image, build-frontend-image, build-nginx-image, build-proxy-image ]
-    if: github.ref == 'refs/heads/main'
+    if: github.base_ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: prod
     steps:
@@ -179,4 +179,4 @@ jobs:
           db-username: ${{ secrets.DB_USERNAME }}
           db-password: ${{ secrets.DB_PASSWORD }}
           app-key: ${{ secrets.APP_KEY }}
-          app-env: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+          app-env: ${{ github.base_ref == 'refs/heads/main' && 'production' || 'staging' }}
