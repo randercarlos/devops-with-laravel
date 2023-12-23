@@ -1,8 +1,8 @@
 name: CI/CD Workflow
 
 on:
-  pull_request:
-    branches: [ "develop", "main" ]
+  pull_request: # considera qualquer branch in qualquer status
+    types: [ opened, synchronize, reopened, closed, labeled, unlabeled ]
 
 env:
   API_IMAGE: rcarlos/devops-with-laravel-api:${{ github.sha }}
@@ -19,7 +19,7 @@ jobs:
     name: Analyze Code
     runs-on: ubuntu-latest
     environment:
-      name: ${{ github.base_ref == 'refs/heads/main' && 'prod' || 'staging' }}
+      name: ${{ github.event.pull_request.base.ref == 'main' && 'prod' || 'staging' }}
     steps:
       - uses: actions/checkout@v3
       - name: Build API Image
@@ -34,7 +34,7 @@ jobs:
     needs: [ analyze-code]
     runs-on: ubuntu-latest
     environment:
-      name: ${{ github.base_ref == 'refs/heads/main' && 'prod' || 'staging' }}
+      name: ${{ github.event.pull_request.base.ref == 'main' && 'prod' || 'staging' }}
     steps:
       - uses: actions/checkout@v3
       - name: Build API Image
