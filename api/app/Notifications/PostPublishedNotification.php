@@ -33,7 +33,7 @@ class PostPublishedNotification extends Notification implements ShouldQueue
         return (new MailMessage)
             ->line('A new post for you!')
             ->line("There is a new post for you: {$this->post->title}")
-            ->action('Read more', route('posts.show', ['post' => $this->post]));
+            ->action('Read more', $this->mountPostShowRoute($this->post));
     }
 
     public function toArray(object $notifiable): array
@@ -41,7 +41,11 @@ class PostPublishedNotification extends Notification implements ShouldQueue
         return [
             'title' => 'A new post for you!',
             'body' => "There is a new post for you: {$this->post->title}",
-            'link' => route('posts.show', ['post' => $this->post]),
+            'link' => $this->mountPostShowRoute($this->post),
         ];
+    }
+
+    private function mountPostShowRoute(Post $post): string {
+        return config('app.url') . "/api/posts/$post->id" ;
     }
 }
