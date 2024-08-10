@@ -10,3 +10,5 @@ deployment/data/
 .env
 id_rsa
 mysql-posts.sql
+.github/workflows/act_secrets_github_actions.prod
+.github/workflows/act_secrets_github_actions.staging
