@@ -16,7 +16,7 @@
             <td>{{ post.headline }}</td>
             <td>{{ post.publish_at }}</td>
             <td>
-                <button v-if="!post.is_published" @click="publish(post)">Publish</button>
+                <button v-if="!post.is_published" @click="publish(post)" :disabled="isPublishing">Publish</button>
             </td>
         </tr>
     </table>
@@ -32,6 +32,7 @@ export default {
     data() {
         return {
             posts: [],
+            isPublishing: false
         };
     },
 
@@ -49,11 +50,13 @@ export default {
         },
 
         async publish(post) {
+          this.isPublishing = true;
           await axios.patch(`/api/posts/${post.id}/publish`, {}, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem('access_token')}` },
           });
 
           await this.fetch();
+          this.isPublishing = false;
         },
 
         async exportPosts() {
