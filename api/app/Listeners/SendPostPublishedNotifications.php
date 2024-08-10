@@ -18,10 +18,8 @@ class SendPostPublishedNotifications implements ShouldQueue
     public function handle(PostPublishedEvent $event): void
     {
         User::where('id', '!=', $event->post->author->id)
+            ->take(5)
             ->get()
-            ->when(true, function (Collection $collection) {
-                return $collection->take(5);
-            })
 //                ->each
 //                ->notify(
 //                    (new PostPublishedNotification($event->post))->onQueue('notifications')
@@ -33,7 +31,7 @@ class SendPostPublishedNotifications implements ShouldQueue
                     );
                 }
                 catch(\Exception $exception) {
-                    logger()->error("Falha ao enviar a notificação de post ppblicado para o email {$user->email} do usuário {$user->name}");
+                    logger()->error("Falha ao enviar a notificação de post publicado para o email {$user->email} do usuário {$user->name}");
                     logger()->error($exception->getMessage());
                 }
             });
