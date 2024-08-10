@@ -30,7 +30,7 @@ class PostPublishedNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->line('A new post for you!')
             ->line("There is a new post for you: {$this->post->title}")
             ->action('Read more', $this->mountPostShowRoute($this->post));
@@ -45,7 +45,8 @@ class PostPublishedNotification extends Notification implements ShouldQueue
         ];
     }
 
-    private function mountPostShowRoute(Post $post): string {
-        return config('app.url') . "/api/posts/$post->id" ;
+    private function mountPostShowRoute(Post $post): string
+    {
+        return config('app.url') . "/api/posts/{$post->id}";
     }
 }
