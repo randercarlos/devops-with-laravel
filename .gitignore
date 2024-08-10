@@ -6,7 +6,7 @@ lightsail-private-key.pem
 .DS_Store
 .idea
 redisdata
-mysqldata
+deployment/data/
 .env
 id_rsa
 mysql-posts.sql
