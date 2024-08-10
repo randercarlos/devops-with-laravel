@@ -6,7 +6,6 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\Storage;
 
 class ExportCompletedNotification extends Notification implements ShouldQueue
 {
@@ -26,7 +25,7 @@ class ExportCompletedNotification extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->line('Your export is completed.')
             ->line('You can now download the Excel file containing every posts.')
             ->action('Download', $this->fileLink)

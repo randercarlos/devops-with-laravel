@@ -5,6 +5,7 @@ WORKDIR /usr/src
 COPY ./frontend/package.* ./
 RUN npm install
 COPY ./frontend .
+COPY ./deployment/bin/wait-for-it.sh ./
 
 FROM base AS dev
 EXPOSE 80

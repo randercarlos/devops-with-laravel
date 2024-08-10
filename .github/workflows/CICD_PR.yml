@@ -1,7 +1,7 @@
-name: CI/CD Workflow
+name: CI/CD Workflow  # Ativado ao abrir PR e atualizar PR aberto
 
 on:
-  pull_request: # qualquer branch ao abrir PR e atualizar o PR
+  pull_request: # qualquer branch ao abrir PR ou atualizar o PR
     types: [ opened, synchronize ]
 
 env:
@@ -19,7 +19,7 @@ jobs:
     name: Analyze Code
     runs-on: ubuntu-latest
     environment:
-      name: ${{ github.event.pull_request.base.ref == 'main' && 'prod' || 'staging' }}
+      name: ${{ (github.event.pull_request.base.ref == 'main' && 'prod') || (github.event.pull_request.base.ref == 'develop' && 'staging') }}
     steps:
       - uses: actions/checkout@v3
       - name: Build API Image
@@ -34,7 +34,7 @@ jobs:
     needs: [ analyze-code]
     runs-on: ubuntu-latest
     environment:
-      name: ${{ github.event.pull_request.base.ref == 'main' && 'prod' || 'staging' }}
+      name: ${{ (github.event.pull_request.base.ref == 'main' && 'prod') || (github.event.pull_request.base.ref == 'develop' && 'staging') }}
     steps:
       - uses: actions/checkout@v3
       - name: Build API Image
