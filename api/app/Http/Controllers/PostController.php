@@ -7,7 +7,6 @@ use App\Http\Requests\UpsertPostRequest;
 use App\Http\Resources\PostResource;
 use App\Jobs\NotifyUserAboutCompletedExport;
 use App\Models\Post;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,7 +31,7 @@ class PostController extends Controller
 
     public function show(Post $post)
     {
-        if (!$post->is_published) {
+        if (! $post->is_published) {
             abort(Response::HTTP_NOT_FOUND);
         }
 
@@ -62,7 +61,7 @@ class PostController extends Controller
 
     public function export()
     {
-        $exportedPostsPath = "exports/posts-" . now()->format('Ymd_His') . ".xlsx";
+        $exportedPostsPath = 'exports/posts-' . now()->format('Ymd_His') . '.xlsx';
 
         $link = Storage::disk('public')->url($exportedPostsPath);
 
@@ -75,7 +74,7 @@ class PostController extends Controller
 //        ]);
 
         logger()->info('Exportação será iniciada...');
-        logger()->info("Arquivo: $exportedPostsPath");
+        logger()->info("Arquivo: {$exportedPostsPath}");
 
         return response('Exportação será iniciada', Response::HTTP_ACCEPTED);
     }

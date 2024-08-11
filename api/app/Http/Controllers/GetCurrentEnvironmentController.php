@@ -8,8 +8,8 @@ class GetCurrentEnvironmentController extends Controller
     {
         return response()->json([
             'data' => [
-                'current-environment' => app()->environment()
-            ]
+                'current-environment' => app()->environment(),
+            ],
         ]);
     }
 }
